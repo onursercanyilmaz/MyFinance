@@ -133,24 +133,30 @@ export function MonthDetail({ yearMonth }: { yearMonth: string }) {
 
         {/* KPI */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label={t.month.totalIncome} value={formatMoney(totals.incomeTotal, state.settings.currency)} sub={`${t.month.collected}: ${formatMoney(totals.incomeDone, state.settings.currency)}`} tone="green" />
-          <Stat label={t.month.totalExpense} value={formatMoney(totals.expenseTotal, state.settings.currency)} sub={`${t.month.paid}: ${formatMoney(totals.expenseDone, state.settings.currency)}`} tone="red" />
-          <Stat
-            label={t.month.netPlanned}
-            value={formatSigned(totals.netPlanned, state.settings.currency)}
-            sub={`${t.month.actual}: ${formatSigned(totals.netActual, state.settings.currency)}`}
-            tone={totals.netPlanned >= 0 ? "green" : "red"}
+          <Stat 
+            label={t.month.totalIncoming} 
+            value={formatMoney(totals.incomeDone, state.settings.currency)} 
+            sub={`${t.month.plannedTotal}: ${formatMoney(totals.incomeTotal, state.settings.currency)}`} 
+            tone="green" 
           />
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-zinc-500 dark:text-zinc-400">{t.month.done}</CardTitle>
-              <div className="text-2xl font-bold">%{totals.progress}</div>
-              <p className="text-xs text-zinc-500">{totals.doneCount}/{totals.totalCount} {t.month.itemsUnit}</p>
-            </CardHeader>
-            <CardContent>
-              <Progress value={totals.progress} />
-            </CardContent>
-          </Card>
+          <Stat 
+            label={t.month.totalPendingIncome} 
+            value={formatMoney(totals.incomeTotal - totals.incomeDone, state.settings.currency)} 
+            sub={t.month.pendingStr} 
+            tone="green" 
+          />
+          <Stat 
+            label={t.month.totalPaidExpense} 
+            value={formatMoney(totals.expenseDone, state.settings.currency)} 
+            sub={`${t.month.plannedTotal}: ${formatMoney(totals.expenseTotal, state.settings.currency)}`} 
+            tone="red" 
+          />
+          <Stat 
+            label={t.month.totalPendingExpense} 
+            value={formatMoney(totals.expenseTotal - totals.expenseDone, state.settings.currency)} 
+            sub={t.month.pendingStr} 
+            tone="red" 
+          />
         </div>
 
         {/* Grafikler */}
