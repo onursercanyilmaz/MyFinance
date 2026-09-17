@@ -1,0 +1,17 @@
+"use client";
+
+// Uygulama logosu - app/icon.svg (favicon) ile birebir aynı artwork.
+// Favicon veya logo değişecekse iki dosya birlikte güncellenmeli.
+export function Logo({ size = 36, className }: { size?: number; className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width={size} height={size} className={className} aria-hidden="true">
+      <rect width="64" height="64" rx="15" fill="#0f172a" />
+      <path d="M16 22.5c0-3 2.4-5.5 5.5-5.5h24c3 0 5.5 2.4 5.5 5.5V27H22.5A6.5 6.5 0 0 1 16 22.5Z" fill="#38bdf8" />
+      <path d="M13 27c0-4.4 3.6-8 8-8h27c2.2 0 4 1.8 4 4v26c0 2.2-1.8 4-4 4H21c-4.4 0-8-3.6-8-8V27Z" fill="#f8fafc" />
+      <path d="M13 30h39v19c0 2.2-1.8 4-4 4H21c-4.4 0-8-3.6-8-8V30Z" fill="#10b981" />
+      <path d="M39 34h15v12H39c-3.3 0-6-2.7-6-6s2.7-6 6-6Z" fill="#064e3b" />
+      <circle cx="40" cy="40" r="2.7" fill="#f8fafc" />
+      <path d="M21.5 25h22" stroke="#0f172a" strokeWidth="3" strokeLinecap="round" opacity="0.22" />
+    </svg>
+  );
+}
