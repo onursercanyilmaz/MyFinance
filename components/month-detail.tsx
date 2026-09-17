@@ -100,13 +100,13 @@ export function MonthDetail({ yearMonth }: { yearMonth: string }) {
       <Header onOpenSettings={() => setShowSettings(true)} />
       <main className="mx-auto max-w-6xl space-y-5 px-4 py-6">
         {/* Üst navigasyon */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Link href="/">
-            <Button variant="outline" size="sm">
-              <ArrowLeft size={15} /> {t.month.allMonths}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <Link href="/" className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <ArrowLeft size={15} className="mr-1" /> {t.month.allMonths}
             </Button>
           </Link>
-          <div className="mx-auto flex items-center gap-1">
+          <div className="flex items-center gap-1 order-first sm:order-none">
             {prev ? (
               <Link href={`/${prev.id}`}>
                 <Button variant="ghost" size="icon" title={`${t.month.prev} ${prev.id}`}>
@@ -126,8 +126,8 @@ export function MonthDetail({ yearMonth }: { yearMonth: string }) {
               </Link>
             ) : null}
           </div>
-          <Button variant="outline" size="sm" onClick={() => setShowCats(true)}>
-            <Settings2 size={15} /> {t.month.categories}
+          <Button variant="outline" size="sm" onClick={() => setShowCats(true)} className="w-full sm:w-auto">
+            <Settings2 size={15} className="mr-1" /> {t.month.categories}
           </Button>
         </div>
 
@@ -313,16 +313,16 @@ function ItemTable({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <CardTitle className="!text-base">{title}</CardTitle>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-500 mt-0.5">
               {kind === "income" ? t.month.totalIncome : t.month.totalExpense} {formatMoney(total, state.settings.currency)} •{" "}
               {kind === "income" ? t.month.collected : t.month.paid} {formatMoney(done, state.settings.currency)}
             </p>
           </div>
-          <Button size="sm" onClick={onAdd}>
-            <Plus size={14} /> {t.common.add}
+          <Button size="sm" onClick={onAdd} className="w-full sm:w-auto shrink-0">
+            <Plus size={14} className="mr-1" /> {t.common.add}
           </Button>
         </div>
       </CardHeader>
@@ -330,7 +330,54 @@ function ItemTable({
         {items.length === 0 ? (
           <Empty title={kind === "income" ? t.month.noIncomeYet : t.month.noExpenseYet} hint={t.month.addFirstIncome} />
         ) : (
-          <div className="overflow-x-auto">
+          
+          <>
+          {/* Mobil Görünüm (Kartlar) */}
+          <div className="grid gap-3 sm:hidden mt-2">
+            {items.map((it) => {
+              const c = catOf(it.categoryId);
+              return (
+                <div key={it.id} className="flex items-center gap-3 rounded-xl border border-zinc-200 p-3 dark:border-zinc-800">
+                  <button
+                    onClick={() => toggleItem(monthId, kind, it.id)}
+                    className={cn(
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors",
+                      it.isCompleted
+                        ? "border-emerald-600 bg-emerald-600 text-white"
+                        : "border-zinc-300 text-transparent hover:border-emerald-500 dark:border-zinc-700"
+                    )}
+                  >
+                    <Check size={16} />
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className="truncate font-semibold text-sm leading-tight">{it.title}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      <Badge className="px-1.5 py-0 text-[10px]">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full mr-1" style={{ background: c?.color ?? "#999" }} />
+                        {c?.name ?? t.month.uncategorized}
+                      </Badge>
+                      {it.installment ? <span className="text-[10px] text-zinc-500">{it.installment}</span> : null}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="font-bold tabular-nums text-sm">{formatMoney(it.amount, state.settings.currency)}</span>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="!h-7 !w-7" onClick={() => onEdit(it)}>
+                        <Pencil size={13} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="!h-7 !w-7 text-red-600" onClick={() => setDeleteTarget(it)}>
+                        <Trash2 size={13} />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Masaüstü Görünüm (Tablo) */}
+          <div className="hidden overflow-x-auto sm:block">
+
             <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="whitespace-nowrap border-b border-zinc-200 text-left text-[11px] uppercase tracking-wide text-zinc-500 dark:border-zinc-800">
@@ -399,6 +446,7 @@ function ItemTable({
               </tbody>
             </table>
           </div>
+          </>
         )}
       </CardContent>
       <ConfirmDialog

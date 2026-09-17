@@ -132,7 +132,7 @@ export function Modal({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" onClick={onClose} />
       <div
         className={cn(
-          "relative w-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900",
+          "relative w-full rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900 max-h-[90vh] overflow-y-auto",
           wide ? "max-w-2xl" : "max-w-md"
         )}
       >
