@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { BudgetProvider } from "@/lib/store";
+import { SyncProvider } from "@/lib/sync-context";
+import { RequireAuth } from "@/components/auth-gate";
 import { LanguageProvider } from "@/lib/i18n";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -22,7 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LanguageProvider>
-            <BudgetProvider>{children}</BudgetProvider>
+            <BudgetProvider>
+              <SyncProvider>
+                <RequireAuth>{children}</RequireAuth>
+              </SyncProvider>
+            </BudgetProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

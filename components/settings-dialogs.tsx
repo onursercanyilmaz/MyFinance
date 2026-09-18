@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { globalTotals, useBudget } from "@/lib/store";
 import { useLang } from "@/lib/i18n";
+import { useSync } from "@/lib/sync-context";
 import { Button, ConfirmDialog, Field, Input, Modal } from "./ui";
 import { Download, Upload } from "lucide-react";
 import { downloadJson } from "@/lib/utils";
@@ -8,6 +9,7 @@ import { validateImportedState } from "@/lib/store-data";
 
 export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { state, setCurrency, setCashBalance, resetAll, loadSample, importState } = useBudget();
+  const { user, signOut, syncStatus, lastSyncedAt, remoteRev, syncError, syncNow, pullNow, forcePushLocal } = useSync();
   const { lang, setLang, t } = useLang();
   const totals = useMemo(() => globalTotals(state), [state]);
   const [currency, setC] = useState(state.settings.currency);
@@ -104,6 +106,39 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
           {msg ? (
             <p className="text-xs text-amber-600 dark:text-amber-500">{msg}</p>
           ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+          <p className="text-xs font-medium text-zinc-500">Bulut Senkron / Supabase</p>
+          {user ? (
+            <div className="grid gap-2">
+              <p className="truncate text-xs text-zinc-600 dark:text-zinc-300">
+                {user.email} • rev {remoteRev} • {syncStatus}
+                {lastSyncedAt ? ` • ${new Date(lastSyncedAt).toLocaleString()}` : ""}
+              </p>
+              {syncError ? <p className="text-xs text-red-600">{syncError}</p> : null}
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => void syncNow()}>
+                  Şimdi senkronla
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => void pullNow()}>
+                  Buluttan al
+                </Button>
+                {syncStatus === "locked" ? (
+                  <Button variant="outline" size="sm" onClick={() => void forcePushLocal()}>
+                    Bulutu sıfırla (yerel veriyi yaz)
+                  </Button>
+                ) : null}
+                <Button variant="destructive" size="sm" onClick={() => void signOut()}>
+                  Çıkış yap
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-zinc-500">
+              Giriş yapmadın. Üst bardaki &quot;Giriş yap&quot; ile PC ve telefonda aynı hesapla giriş yap.
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">

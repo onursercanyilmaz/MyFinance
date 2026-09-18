@@ -2,7 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { AppBudgetState, BudgetItem, Category, Investment, MonthData } from "./types";
-import { STORAGE_KEY, defaultState, validateImportedState } from "./store-data";
+import { defaultState, getActiveStorageKey, isCacheWritesSuspended, validateImportedState } from "./store-data";
 import { uid } from "./utils";
 
 interface BudgetContextValue {
@@ -42,7 +42,7 @@ const BudgetContext = createContext<BudgetContextValue | null>(null);
 function readFromStorage(): AppBudgetState {
   if (typeof window === "undefined") return defaultState();
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(getActiveStorageKey());
     if (!raw) return defaultState();
     const parsed: unknown = JSON.parse(raw);
     const v = validateImportedState(parsed);
@@ -66,8 +66,9 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loaded) return;
+    if (isCacheWritesSuspended()) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      window.localStorage.setItem(getActiveStorageKey(), JSON.stringify(state));
     } catch (e) {
       console.warn("localStorage yazma hatası", e);
     }

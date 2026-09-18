@@ -3,6 +3,52 @@ import { parseYearMonth } from "./utils";
 
 export const STORAGE_KEY = "myfinance-budget-v1";
 
+/**
+ * Yerel önbellek hesab bazlı tutulur: `myfinance-budget-v1:<userId>`.
+ * Böylece aynı tarayıcıda başka hesaba girince önceki hesabın verileri gelmez.
+ * Aktif anahtar SyncProvider tarafından oturuma göre seçilir.
+ */
+export const LEGACY_OWNER_KEY = "myfinance-legacy-owner";
+
+let activeStorageKey: string = STORAGE_KEY;
+
+// Çıkış anında hafıza sıfırlanırken localStorage'a boş veri yazılmaması için.
+let cacheWritesSuspended = false;
+
+export function setCacheWritesSuspended(v: boolean): void {
+  cacheWritesSuspended = v;
+}
+
+export function isCacheWritesSuspended(): boolean {
+  return cacheWritesSuspended;
+}
+
+export function getActiveStorageKey(): string {
+  return activeStorageKey;
+}
+
+export function setActiveStorageKey(key: string): void {
+  activeStorageKey = key;
+}
+
+export function namespacedKey(uid: string): string {
+  return `${STORAGE_KEY}:${uid}`;
+}
+
+/** Verilen anahtardaki JSON'u doğrular, bozuk/eksikse null döner. */
+export function readStateFromKey(key: string): AppBudgetState | null {
+  try {
+    if (typeof window === "undefined") return null;
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const v = validateImportedState(JSON.parse(raw) as unknown);
+    if (!v.ok) return null;
+    return v.state;
+  } catch {
+    return null;
+  }
+}
+
 export const DEFAULT_CATEGORIES: AppBudgetState["categories"] = [
   { id: "cat_maas", name: "Maaş", type: "income", color: "#16a34a" },
   { id: "cat_freelance", name: "Freelance", type: "income", color: "#0ea5e9" },

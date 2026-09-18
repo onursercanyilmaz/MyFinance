@@ -9,11 +9,14 @@ import { formatMoney } from "@/lib/utils";
 import { Button } from "./ui";
 import { Logo } from "./logo";
 import { useMemo } from "react";
+import { useSync } from "@/lib/sync-context";
+import { ConflictDialog, SyncBadge } from "./sync-ui";
 
 export function Header({ onOpenSettings }: { onOpenSettings: () => void }) {
   const { theme, setTheme } = useTheme();
   const { state } = useBudget();
   const { t } = useLang();
+  const { session } = useSync();
   const totals = useMemo(() => globalTotals(state), [state]);
 
   return (
@@ -28,6 +31,15 @@ export function Header({ onOpenSettings }: { onOpenSettings: () => void }) {
         </Link>
 
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          <SyncBadge onAuth={() => {}} />
+          {session ? (
+            <span
+              title={session.user.email ?? ""}
+              className="max-w-[140px] truncate rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+            >
+              {session.user.email}
+            </span>
+          ) : null}
           <span
             className="hidden rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 sm:inline dark:bg-emerald-950 dark:text-emerald-300"
             title={`${t.header.cash} ${formatMoney(totals.balanceActual, state.settings.currency)}`}
@@ -49,6 +61,7 @@ export function Header({ onOpenSettings }: { onOpenSettings: () => void }) {
           </Button>
         </div>
       </div>
+      <ConflictDialog />
     </header>
   );
 }
